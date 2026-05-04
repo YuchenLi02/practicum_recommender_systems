@@ -1,0 +1,50 @@
+dataset:
+  name: amazon-beauty
+  loader: load_amazon_beauty
+  data_dir: data/amazon_beauty
+  train_frac: 0.8
+
+base_rankers:
+  - name: popularity
+  - name: als
+    factors: 64
+    iterations: 30
+    regularization: 0.01
+  - name: neumf
+    emb_dim: 32
+    mlp_dims: [64, 32, 16, 8]
+    epochs: 20
+    batch_size: 2048
+    lr: 0.001
+    n_neg: 4
+  - name: sasrec
+    hidden_units: 64
+    num_blocks: 2
+    num_heads: 2
+    max_seq_len: 50
+    epochs: 100
+    batch_size: 256
+  - name: tiger
+    codebook_size: 256
+    n_codewords: 4
+    rqvae_epochs: 200
+    transformer_epochs: 200
+    beam_width: 50
+
+rerankers:
+  - {name: identity}
+  - {name: mmr, lam: 1.0}
+  - {name: mmr, lam: 0.8}
+  - {name: mmr, lam: 0.6}
+  - {name: mmr, lam: 0.4}
+  - {name: mmr, lam: 0.2}
+  - {name: dpp, alpha: 0.5}
+  - {name: dpp, alpha: 1.0}
+  - {name: dpp, alpha: 2.0}
+  - {name: dpp, alpha: 4.0}
+
+evaluation:
+  k: 10
+  n_candidates: 50
+  seeds: [0, 1, 2, 3, 4]
+  bootstrap_resamples: 1000
